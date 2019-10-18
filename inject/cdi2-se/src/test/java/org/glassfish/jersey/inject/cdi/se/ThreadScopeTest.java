@@ -29,6 +29,8 @@ import org.glassfish.jersey.internal.inject.PerThread;
 import org.glassfish.jersey.process.internal.RequestScope;
 
 import org.hamcrest.core.StringStartsWith;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -43,9 +45,20 @@ import static org.junit.Assert.assertThat;
  */
 public class ThreadScopeTest {
 
+    private InjectionManager injectionManager;
+
+    @Before
+    public void setUp() {
+        injectionManager = BindingTestHelper.createInjectionManager();
+    }
+
+    @After
+    public void tearDown() {
+        injectionManager.shutdown();
+    }
+
     @Test
     public void testThreadScopedInDifferentThread() throws InterruptedException {
-        InjectionManager injectionManager = BindingTestHelper.createInjectionManager();
         BindingTestHelper.bind(injectionManager, binder -> {
             binder.bindAsContract(SingletonObject.class)
                     .in(Singleton.class);
@@ -80,7 +93,6 @@ public class ThreadScopeTest {
 
     @Test
     public void testThreadScopedInRequestScope() {
-        InjectionManager injectionManager = BindingTestHelper.createInjectionManager();
         BindingTestHelper.bind(injectionManager, binder -> {
             binder.bindAsContract(RequestScopedInterface.class)
                     .in(RequestScoped.class);
@@ -107,7 +119,6 @@ public class ThreadScopeTest {
 
     @Test
     public void testThreadScopedInRequestScopeImplementation() {
-        InjectionManager injectionManager = BindingTestHelper.createInjectionManager();
         BindingTestHelper.bind(injectionManager, binder -> {
             binder.bindAsContract(RequestScopedCzech.class)
                     .in(RequestScoped.class);
@@ -134,7 +145,6 @@ public class ThreadScopeTest {
 
     @Test
     public void testThreadScopedInRequestTwoTypes() {
-        InjectionManager injectionManager = BindingTestHelper.createInjectionManager();
         BindingTestHelper.bind(injectionManager, binder -> {
             binder.bindAsContract(RequestScopedCzech.class)
                     .in(RequestScoped.class);
@@ -168,7 +178,6 @@ public class ThreadScopeTest {
 
     @Test
     public void testThreadScopedInSingletonScope() {
-        InjectionManager injectionManager = BindingTestHelper.createInjectionManager();
         BindingTestHelper.bind(injectionManager, binder -> {
             binder.bindAsContract(SingletonObject.class)
                     .in(Singleton.class);

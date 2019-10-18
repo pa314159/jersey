@@ -155,7 +155,5 @@ class SeBeanRegisterExtension implements Extension {
                 BeanHelper.registerSupplier((SupplierInstanceBinding<?>) binding, abd, beanManager);
             }
         }
-
-        abd.addBean(new RequestScopeBean(beanManager));
     }
 }

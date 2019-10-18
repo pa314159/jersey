@@ -31,6 +31,7 @@ import javax.enterprise.inject.se.SeContainerInitializer;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.CDI;
 import javax.enterprise.inject.spi.InjectionTarget;
 import javax.enterprise.inject.spi.Unmanaged;
 
@@ -168,7 +169,7 @@ public class CdiSeInjectionManager implements InjectionManager {
      * @return true if completeRegistration was already invoked. False if it's not yet initialized
      */
     private boolean isInitialized() {
-        return container != null && beanManager != null;
+        return /* container != null && */beanManager != null;
     }
 
     @Override
@@ -236,31 +237,36 @@ public class CdiSeInjectionManager implements InjectionManager {
         bindings.bind(Bindings.service(this).to(InjectionManager.class));
         bindings.install(new ContextInjectionResolverImpl.Binder(this::getBeanManager));
 
-        SeContainerInitializer containerInitializer = SeContainerInitializer.newInstance();
-        containerInitializer.addExtensions(new SeBeanRegisterExtension(bindings));
-        this.container = containerInitializer.initialize();
-        this.beanManager = container.getBeanManager();
+        try {
+            beanManager = CDI.current().getBeanManager();
+        } catch (IllegalStateException e) {
+            SeContainerInitializer containerInitializer = SeContainerInitializer.newInstance();
+            containerInitializer.addExtensions(new SeBeanRegisterExtension(bindings));
+
+            container = containerInitializer.initialize();
+            beanManager = container.getBeanManager();
+        }
     }
 
     protected AbstractBinder getBindings() {
         return bindings;
     }
 
-    public SeContainer getContainer() {
-        return container;
-    }
+//    public SeContainer getContainer() {
+//        return container;
+//    }
 
-    public void setContainer(SeContainer container) {
-        this.container = container;
-    }
+//    public void setContainer(SeContainer container) {
+//        this.container = container;
+//    }
 
     public BeanManager getBeanManager() {
         return beanManager;
     }
 
-    public void setBeanManager(BeanManager beanManager) {
-        this.beanManager = beanManager;
-    }
+//    public void setBeanManager(BeanManager beanManager) {
+//        this.beanManager = beanManager;
+//    }
 
     @Override
     public void shutdown() {
