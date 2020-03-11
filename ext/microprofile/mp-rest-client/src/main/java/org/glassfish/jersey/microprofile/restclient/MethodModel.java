@@ -17,11 +17,12 @@
 
 package org.glassfish.jersey.microprofile.restclient;
 
+import static io.leangen.geantyref.GenericTypeReflector.getExactReturnType;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -554,12 +555,9 @@ class MethodModel {
          * @param returnType Method return type
          */
         private void returnType(Type returnType) {
-            if (returnType instanceof ParameterizedType
-                    && CompletionStage.class.isAssignableFrom((Class<?>) ((ParameterizedType) returnType).getRawType())) {
-                this.returnType = new GenericType<>(((ParameterizedType) returnType).getActualTypeArguments()[0]);
-            } else {
-                this.returnType = new GenericType<>(returnType);
-            }
+            Type exactType = getExactReturnType(method, interfaceModel.getRestClientClass());
+
+            this.returnType = new GenericType<>(exactType);
         }
 
         /**
